@@ -1,11 +1,11 @@
 import React, {Component}  from 'react';
 import {View} from  'react-native';
-import {Header, Button} from './components/common';
+import {Header, Button, Spinner} from './components/common';
 import firebase from 'firebase';
 import LoginForm from './components/LoginForm';
 
 class App extends Component {
-    state = { loggedIn: false};
+    state = { loggedIn: null};
     componentWillMount(){
         firebase.initializeApp({
                 apiKey: "AIzaSyDjOvAUF-19OC76PquKlEBFkpvQReStSEo",
@@ -26,17 +26,22 @@ class App extends Component {
     }
 
     renderContent(){
-        if (this.state.loggedIn) {
-        return (
-            <View style={styles.buttonContainerStyle}>
-                <Button>Logout</Button>
-            </View>
-        )
+        switch (this.state.loggedIn) {
+            case true:           
+                return (
+                    <View style={styles.containerStyle}>
+                        <Button onPress={() => {firebase.auth().signOut()}}>Logout</Button>
+                    </View>
+                )    
+            case false:           
+                return <LoginForm></LoginForm>    
+            default:
+                return (
+                <View style={styles.containerStyle}>
+                    <Spinner size="large"></Spinner>
+                </View>
+                );
         }
-
-        return (
-            <LoginForm></LoginForm>
-        );
     }
 
   render() {
@@ -52,7 +57,7 @@ class App extends Component {
 // new version of react-native has changed some of the default styles
 // button now needs to be wrapped in a view to be shown fo this example
 const styles = {
-  buttonContainerStyle: {
+  containerStyle: {
     flexDirection: 'row'
   }
 };
