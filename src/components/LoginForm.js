@@ -11,6 +11,7 @@ class LoginForm extends Component {
         loading: false,
     }
 
+    // use this.bind on callback functions
     onButtonPress(){
         const {email, password} = this.state;
 
@@ -18,12 +19,27 @@ class LoginForm extends Component {
         this.setState({error: '', loading: true})
 
         firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(this.onLoginSuccess.bind(this))
         .catch(() => {
             firebase.auth().createUserWithEmailAndPassword(email, password)
-            .catch((err) => {
-                console.log('Error is ', err);
-                this.setState({error: 'Authentication failed'});
-            })
+            .then(this.onLoginSuccess.bind(this))
+            .catch(this.onLoginfailed.bind(this))
+        })
+    }
+
+    onLoginfailed(){
+        this.setState({
+            error: 'Authentication failed',
+            loading: false
+        })
+    }
+
+    onLoginSuccess(){
+        this.setState({
+            email: '',
+            password: '',
+            loading: false,
+            error: ''
         })
     }
 
