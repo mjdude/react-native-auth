@@ -1,10 +1,11 @@
 import React, {Component}  from 'react';
 import {View} from  'react-native';
-import {Header} from './components/common';
+import {Header, Button} from './components/common';
 import firebase from 'firebase';
 import LoginForm from './components/LoginForm';
 
 class App extends Component {
+    state = { loggedIn: false};
     componentWillMount(){
         firebase.initializeApp({
                 apiKey: "AIzaSyDjOvAUF-19OC76PquKlEBFkpvQReStSEo",
@@ -14,15 +15,46 @@ class App extends Component {
                 storageBucket: "react-native-auth-90ba3.appspot.com",
                 messagingSenderId: "20381967930"
         })
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                this.setState({loggedIn: true})
+            } else {
+                this.setState({loggedIn: false})
+            }
+        });
     }
-    render(){
+
+    renderContent(){
+        if (this.state.loggedIn) {
         return (
-            <View>
-                <Header headerText="Authentication"></Header>
-                <LoginForm></LoginForm>
+            <View style={styles.buttonContainerStyle}>
+                <Button>Logout</Button>
             </View>
         )
+        }
+
+        return (
+            <LoginForm></LoginForm>
+        );
     }
+
+  render() {
+    return (
+      <View>
+        <Header headerText="Authentication" />
+        {this.renderContent()}
+      </View>
+    );
+  }
 }
+
+// new version of react-native has changed some of the default styles
+// button now needs to be wrapped in a view to be shown fo this example
+const styles = {
+  buttonContainerStyle: {
+    flexDirection: 'row'
+  }
+};
 
 export default App;
